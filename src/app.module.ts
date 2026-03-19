@@ -3,6 +3,7 @@ import { ConfigModule, ConfigService } from "@nestjs/config";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { AppController } from "./app.controller";
 import { AppService } from "./app.service";
+import { AuthModule } from "./auth/auth.module";
 import { UsersModule } from "./users/users.module";
 import { TodosModule } from "./todos/todos.module";
 
@@ -26,6 +27,7 @@ import { TodosModule } from "./todos/todos.module";
       }),
       inject: [ConfigService],
     }),
+    AuthModule,
     UsersModule,
     TodosModule,
   ],

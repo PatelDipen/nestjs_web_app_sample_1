@@ -1,8 +1,6 @@
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { Repository } from "typeorm";
-import { CreateUserDto } from "../application/dto/create-user.dto";
-import { UpdateUserDto } from "../application/dto/update-user.dto";
+import { DeepPartial, Repository } from "typeorm";
 import { User } from "../domain/user";
 import { UserOrmEntity } from "./user.orm-entity";
 
@@ -21,14 +19,25 @@ export class UsersRepository {
     return this.ormRepository.findOne({ where: { id } });
   }
 
-  async create(createUserDto: CreateUserDto): Promise<User> {
+  async create(createUserDto: DeepPartial<UserOrmEntity>): Promise<User> {
     const entity = this.ormRepository.create(createUserDto);
     return this.ormRepository.save(entity);
   }
 
-  async update(id: number, updateUserDto: UpdateUserDto): Promise<User | null> {
+  async update(
+    id: number,
+    updateUserDto: DeepPartial<UserOrmEntity>,
+  ): Promise<User | null> {
     await this.ormRepository.update(id, updateUserDto);
     return this.findById(id);
+  }
+
+  async findByEmailWithPassword(email: string): Promise<UserOrmEntity | null> {
+    return this.ormRepository
+      .createQueryBuilder("user")
+      .addSelect("user.password_hash")
+      .where("user.email = :email", { email })
+      .getOne();
   }
 
   async delete(id: number): Promise<number> {
